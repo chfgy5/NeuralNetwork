@@ -14,8 +14,6 @@ class neural_network:
         self.weights_output_layer = np.array(self.get_given_values("./inputs/w2 (from 11 to 2).csv"))
         self.outputs = np.zeros([len(self.inputs), len(self.weights_output_layer)])
         self.errors = np.zeros([len(self.inputs), len(self.weights_output_layer)])
-        self.delta_output = np.zeros([len(self.inputs), len(self.weights_output_layer)])
-        self.delta_input = np.zeros([len(self.inputs), len(self.weights_hidden_layer)])
         self.delta_weights_hidden = np.zeros([len(self.weights_hidden_layer), len(self.weights_hidden_layer[0])])
         self.delta_weights_output = np.zeros([len(self.weights_output_layer), len(self.weights_output_layer[0])])
         self.activation_function = sigmoid
@@ -46,20 +44,25 @@ class neural_network:
             self.errors[j] = self.inputs[j][3:5] - self.outputs[j]
             
             #start backprop
-            self.delta_output[j] = self.errors[j] * self.outputs[j] * (1 - self.outputs[j])
-            self.delta_input[j] = self.hidden_layer_outputs * (1 - self.hidden_layer_outputs) * np.dot(self.delta_output[j], self.weights_output_layer)
+            delta_output = np.array(self.errors[j] * self.outputs[j] * (1 - self.outputs[j]))
+            delta_input = self.hidden_layer_outputs * (1 - self.hidden_layer_outputs) * np.dot(delta_output, self.weights_output_layer)
                      
             #Not using momentum becuase delta w (k-1) not given
-            for l in range(len(self.delta_output[j])):
-                self.delta_weights_output = self.learning_rate * self.delta_output[j][l] * self.hidden_layer_outputs
-            for l in range(len(self.delta_input[j])):
-                self.delta_weights_hidden[l] = self.learning_rate * self.delta_input[j][l] * self.inputs[j][0:3]
+            for l in range(len(delta_output)):
+                self.delta_weights_output = self.learning_rate * delta_output[l] * self.hidden_layer_outputs
+            for l in range(len(delta_input)):
+                self.delta_weights_hidden[l] = self.learning_rate * delta_input[l] * self.inputs[j][0:3]
 
             self.weights_hidden_layer = self.weights_hidden_layer - self.delta_weights_hidden
             self.weights_output_layer = self.weights_output_layer - self.delta_weights_output
+            self.bias_hidden_layer = self.bias_hidden_layer - delta_input.reshape(11,1)
+            self.bias_output_layer = self.bias_output_layer - delta_output.reshape(2,1)
 
 
 
 nn = neural_network()
 nn.train()
-
+print(nn.weights_hidden_layer, end="\n\n")
+print(nn.weights_output_layer, end="\n\n")
+print(nn.bias_hidden_layer, end="\n\n")
+print(nn.bias_output_layer)
