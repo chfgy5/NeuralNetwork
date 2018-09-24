@@ -1,55 +1,43 @@
-import numpy
+import numpy as np
 import csv
 
-inputs = []
-bias_hidden_layer = []
-weights_hidden_layer = []
-bias_output_layer = []
-weights_output_layer = []
+def sigmoid(x):
+    return 1 / (1 + np.e ** -x)
 
-with open("./inputs/cross_data (3 inputs - 2 outputs).csv") as input_csv:
-    csv_reader = csv.reader(input_csv, delimiter=',')
-    for row in csv_reader:
-        arr = []
-        for item in row:
-            arr.append(float(item))
-        inputs.append(arr)
+class neural_network:
+    def __init__(self):
+        self.inputs = np.array(self.get_given_values("./inputs/cross_data (3 inputs - 2 outputs).csv"))
+        self.bias_hidden_layer = np.array(self.get_given_values("./inputs/b1 (11 nodes).csv"))
+        self.weights_hidden_layer = np.array(self.get_given_values("./inputs/w1 (3 inputs - 11 nodes).csv"))
+        self.bias_output_layer = np.array(self.get_given_values("./inputs/b2 (2 output nodes).csv"))
+        self.weights_output_layer = np.array(self.get_given_values("./inputs/w2 (from 11 to 2).csv"))
+        self.activation_function = sigmoid
 
-with open("./inputs/b1 (11 nodes).csv") as bias_hidden_layer_csv:
-    csv_reader = csv.reader(bias_hidden_layer_csv, delimiter=',')
-    for row in csv_reader:
-        arr = []
-        for item in row:
-            arr.append(float(item))
-        bias_hidden_layer.append(arr)
+    def get_given_values(self, filepath):
+        array = []
+        with open(filepath) as doc:
+            csv_reader = csv.reader(doc, delimiter=',')
+            for row in csv_reader:
+                arr = []
+                for item in row:
+                    arr.append(float(item))
+                array.append(arr)
+        return array
+    
+    def train(self):
+        for value in self.inputs:
+            for weight in self.weights_hidden_layer:
+                hidden_layer_induced_fields = np.dot(value[0:3], weight) + self.bias_hidden_layer
+                #print(hidden_layer_induced_fields)
+                hidden_layer_outputs = self.activation_function(hidden_layer_induced_fields)
+                print(hidden_layer_outputs)
+            break
 
-with open("./inputs/w1 (3 inputs - 11 nodes).csv") as input_weights_hidden_layer_csv:
-    csv_reader = csv.reader(input_weights_hidden_layer_csv, delimiter=',')
-    for row in csv_reader:
-        arr = []
-        for item in row:
-            arr.append(float(item))
-        weights_hidden_layer.append(arr)
-
-with open("./inputs/b2 (2 output nodes).csv") as bias_output_layer_csv:
-    csv_reader = csv.reader(bias_output_layer_csv, delimiter=',')
-    for row in csv_reader:
-        arr = []
-        for item in row:
-            arr.append(float(item))
-        bias_output_layer.append(arr)
-
-with open("./inputs/w2 (from 11 to 2).csv") as input_weights_output_layer_csv:
-    csv_reader = csv.reader(input_weights_output_layer_csv, delimiter=',')
-    for row in csv_reader:
-        arr = []
-        for item in row:
-            arr.append(float(item))
-        weights_output_layer.append(arr)
-
-print("inputs: ", inputs)
-print("bias hidden: ", bias_hidden_layer)
-print("weights hidden: ", weights_hidden_layer)
-print("bias output: ", bias_output_layer)
-print("weights output: ", weights_output_layer)
-print("\n\n")
+nn = neural_network()
+# print("inputs: ", nn.inputs)
+# print("bias hidden: ", nn.bias_hidden_layer)
+# print("weights hidden: ", nn.weights_hidden_layer)
+# print("bias output: ", nn.bias_output_layer)
+# print("weights output: ", nn.weights_output_layer)
+# print("\n\n")
+nn.train()
