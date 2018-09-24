@@ -9,8 +9,11 @@ class neural_network:
         self.inputs = np.array(self.get_given_values("./inputs/cross_data (3 inputs - 2 outputs).csv"))
         self.bias_hidden_layer = np.array(self.get_given_values("./inputs/b1 (11 nodes).csv"))
         self.weights_hidden_layer = np.array(self.get_given_values("./inputs/w1 (3 inputs - 11 nodes).csv"))
+        self.hidden_layer_outputs = np.zeros(11)
         self.bias_output_layer = np.array(self.get_given_values("./inputs/b2 (2 output nodes).csv"))
         self.weights_output_layer = np.array(self.get_given_values("./inputs/w2 (from 11 to 2).csv"))
+        self.outputs = np.zeros([len(self.inputs), len(self.weights_output_layer)])
+        self.errors = np.zeros([len(self.inputs), len(self.weights_output_layer)])
         self.activation_function = sigmoid
 
     def get_given_values(self, filepath):
@@ -25,19 +28,21 @@ class neural_network:
         return array
     
     def train(self):
-        for value in self.inputs:
-            for weight in self.weights_hidden_layer:
-                hidden_layer_induced_fields = np.dot(value[0:3], weight) + self.bias_hidden_layer
-                #print(hidden_layer_induced_fields)
-                hidden_layer_outputs = self.activation_function(hidden_layer_induced_fields)
-                print(hidden_layer_outputs)
-            break
+        for j in range(1):#range(len(self.inputs)):
+            for i in range(len(self.weights_hidden_layer)):
+                hidden_layer_induced_fields = np.dot(self.inputs[j][0:3], self.weights_hidden_layer[i]) + self.bias_hidden_layer[i]
+                self.hidden_layer_outputs[i] = self.activation_function(hidden_layer_induced_fields)
+            
+            print(self.hidden_layer_outputs)
+            print("\n")
+            for i in range(len(self.weights_output_layer)):
+                output_layer_induced_fields = np.dot(self.hidden_layer_outputs, self.weights_output_layer[i]) + self.bias_output_layer[i]
+                self.outputs[j][i] = self.activation_function(output_layer_induced_fields)
+            
+            self.errors[j] = self.inputs[j][3:5] - self.outputs[j]
+            print(self.outputs[j], self.errors[j])
+            
+
 
 nn = neural_network()
-# print("inputs: ", nn.inputs)
-# print("bias hidden: ", nn.bias_hidden_layer)
-# print("weights hidden: ", nn.weights_hidden_layer)
-# print("bias output: ", nn.bias_output_layer)
-# print("weights output: ", nn.weights_output_layer)
-# print("\n\n")
 nn.train()
