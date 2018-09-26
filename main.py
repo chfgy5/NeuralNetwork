@@ -34,7 +34,7 @@ class neural_network:
         return array
     
     def train(self):
-        for j in range(1):#range(len(self.inputs)):
+        for j in range(len(self.inputs)):
             for i in range(len(self.weights_hidden_layer)):
                 hidden_layer_induced_fields = np.dot(self.inputs[j][0:3], self.weights_hidden_layer[i]) + self.bias_hidden_layer[i]
                 self.hidden_layer_outputs[i] = self.activation_function(hidden_layer_induced_fields)
@@ -47,29 +47,44 @@ class neural_network:
             
             #start backprop
             delta_output = np.array(self.errors[j] * self.outputs[j] * (1 - self.outputs[j]))
-            print(delta_output, "\n\n")
             delta_input = self.hidden_layer_outputs * (1 - self.hidden_layer_outputs) * np.dot(delta_output, self.weights_output_layer)
-            print(delta_input, "\n\n")         
 
             for l in range(len(delta_output)):
                 self.delta_weights_output[l] = self.learning_rate * delta_output[l] * self.hidden_layer_outputs + self.momentum * self.delta_weights_output_old[l]
             for l in range(len(delta_input)):
                 self.delta_weights_hidden[l] = self.learning_rate * delta_input[l] * self.inputs[j][0:3] + self.momentum * self.delta_weights_hidden_old[l]
 
-            self.weights_hidden_layer = self.weights_hidden_layer - self.delta_weights_hidden
-            self.weights_output_layer = self.weights_output_layer - self.delta_weights_output
-            self.bias_hidden_layer = self.bias_hidden_layer - delta_input.reshape(11,1)
-            self.bias_output_layer = self.bias_output_layer - delta_output.reshape(2,1)
+            self.weights_hidden_layer = self.weights_hidden_layer + self.delta_weights_hidden
+            self.weights_output_layer = self.weights_output_layer + self.delta_weights_output
+            self.bias_hidden_layer = self.bias_hidden_layer + delta_input.reshape(11,1)
+            self.bias_output_layer = self.bias_output_layer + delta_output.reshape(2,1)
 
             self.delta_weights_hidden_old = self.delta_weights_hidden
             self.delta_weights_output_old = self.delta_weights_output
 
+    def sum_of_squared_error(self):
+        return np.sum(self.errors ** 2)
 
 
 nn = neural_network()
 nn.train()
+print(np.around(nn.weights_hidden_layer, 4), end="\n\n")
+print(np.around(nn.weights_output_layer, 4), end="\n\n")
+print(np.around(nn.bias_hidden_layer, 4), end="\n\n")
+print(np.around(nn.bias_output_layer, 4), end="\n\n")
+print("%.4g" % round(nn.sum_of_squared_error(), 4))
 
-print(nn.weights_hidden_layer, end="\n\n")
-print(nn.weights_output_layer, end="\n\n")
-print(nn.bias_hidden_layer, end="\n\n")
-print(nn.bias_output_layer)
+# SSE = (143 * 3) ** 2 + 1 #max sse could be
+# epochs = 0
+# #do while
+# while True:
+#     nn.train()
+
+#     tmp_SSE = nn.sum_of_squared_error()
+#     delta_SSE = SSE - tmp_SSE
+#     SSE = tmp_SSE
+#     epochs += 1
+#     if delta_SSE < .001:
+#         break
+
+# print(epochs)
