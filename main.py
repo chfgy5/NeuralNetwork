@@ -18,6 +18,8 @@ class neural_network:
         self.delta_weights_output = np.zeros([len(self.weights_output_layer), len(self.weights_output_layer[0])])
         self.delta_weights_hidden_old = np.zeros([len(self.weights_hidden_layer), len(self.weights_hidden_layer[0])])
         self.delta_weights_output_old = np.zeros([len(self.weights_output_layer), len(self.weights_output_layer[0])])
+        self.delta_bias_hidden_old = np.zeros([len(self.bias_hidden_layer), len(self.bias_hidden_layer[0])])
+        self.delta_bias_output_old = np.zeros([len(self.bias_output_layer), len(self.bias_output_layer[0])])
         self.activation_function = sigmoid
         self.learning_rate = .7
         self.momentum = .3
@@ -54,13 +56,18 @@ class neural_network:
             for l in range(len(delta_input)):
                 self.delta_weights_hidden[l] = self.learning_rate * delta_input[l] * self.inputs[j][0:3] + self.momentum * self.delta_weights_hidden_old[l]
 
+            self.delta_bias_hidden = self.learning_rate * delta_input.reshape(11,1) + self.momentum * self.delta_bias_hidden_old
+            self.delta_bias_output = self.learning_rate * delta_output.reshape(2,1) + self.momentum * self.delta_bias_output_old
+
             self.weights_hidden_layer = self.weights_hidden_layer + self.delta_weights_hidden
             self.weights_output_layer = self.weights_output_layer + self.delta_weights_output
-            self.bias_hidden_layer = self.bias_hidden_layer + delta_input.reshape(11,1)
-            self.bias_output_layer = self.bias_output_layer + delta_output.reshape(2,1)
+            self.bias_hidden_layer = self.bias_hidden_layer + self.delta_bias_hidden
+            self.bias_output_layer = self.bias_output_layer + self.delta_bias_output
 
             self.delta_weights_hidden_old = self.delta_weights_hidden
             self.delta_weights_output_old = self.delta_weights_output
+            self.delta_bias_hidden_old = self.delta_bias_hidden
+            self.delta_bias_output_old = self.delta_bias_output
 
     def sum_of_squared_error(self):
         return np.sum(self.errors ** 2)
